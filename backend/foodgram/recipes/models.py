@@ -1,7 +1,7 @@
 import re
 
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -41,26 +41,52 @@ class Tag(models.Model):
         return self.name
 
 
+class IngredientAmount(models.Model):
+    amount = models.SmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(32767),
+        ]
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.PROTECT,
+        related_name="ingredients_amounts",
+    )
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = "Количество ингредиента"
+        verbose_name_plural = "Количество ингредиентов"
+
+    def __str__(self):
+        return f"{self.recipe.name}: {self.ingredient.name} – {self.amount}"
+
+
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
     text = models.TextField()
     cooking_time = models.SmallIntegerField(
         validators=[
             MinValueValidator(1),
+            MaxValueValidator(32767),
         ]
     )
     image = models.ImageField(
         upload_to="recipies/",
-        blank=True,
+        null=True,
     )
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
     author = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         related_name="recipes",
     )
+    ingredients = models.ManyToManyField(
+        IngredientAmount, related_name="recipes"
+    )
     tags = models.ManyToManyField(Tag, related_name="recipes")
-    ingredients = models.ManyToManyField(Ingredient, related_name="recipes")
 
     class Meta:
         ordering = ["-pub_date"]
@@ -78,7 +104,7 @@ class Favourite(models.Model):
         related_name="favourites",
     )
     recipe = models.ForeignKey(
-        User,
+        Recipe,
         on_delete=models.CASCADE,
         related_name="favourites",
     )
@@ -96,12 +122,12 @@ class Subscription(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="subscriptions",
+        related_name="authors",
     )
     follower = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="subscriptions",
+        related_name="followers",
     )
 
     class Meta:
@@ -113,7 +139,7 @@ class Subscription(models.Model):
         return f"{self.author.username} – {self.follower.username}"
 
 
-class Shopping_list(models.Model):
+class ShoppingList(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
