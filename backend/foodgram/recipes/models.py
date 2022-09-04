@@ -8,14 +8,29 @@ from users.models import User
 
 
 def validate_hex(value):
-    pattern = re.compile("^\#\d{3,6}$")
+    pattern = re.compile("^\#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$")
     if pattern.match(value) == None:
-        raise ValidationError("%s is not an even number" % value)
+        raise ValidationError("%s is not an HEX color" % value)
+
+
+# class IngridientsFilter(InputFilter):
+#     parameter_name = "uid"
+#     title = _("UID")
+
+#     def queryset(self, request, queryset):
+#         if self.value() is not None:
+#             uid = self.value()
+
+#             return queryset.filter(
+#                 Q(uid=uid) | Q(payment__uid=uid) | Q(user__uid=uid)
+#             )
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    measurement_unit = models.CharField(max_length=200)
+    name = models.CharField(
+        "Название ингредиента", max_length=200, unique=True
+    )
+    measurement_unit = models.CharField("Единица измерения", max_length=200)
 
     class Meta:
         ordering = ["id"]
@@ -27,9 +42,11 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    сolor = models.CharField(max_length=7, validators=[validate_hex])
-    slug = models.SlugField(unique=True)
+    name = models.CharField("Название тега", max_length=200, unique=True)
+    color = models.CharField(
+        "Цвет в HEX", max_length=7, validators=[validate_hex]
+    )
+    slug = models.SlugField("Отображение в URL (slug)", unique=True)
 
     class Meta:
         ordering = ["id"]
@@ -63,15 +80,17 @@ class IngredientAmount(models.Model):
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=200)
-    text = models.TextField()
+    name = models.CharField("Название рецепта", max_length=200)
+    text = models.TextField("Текст рецепта")
     cooking_time = models.SmallIntegerField(
+        "Время приготовления (мин)",
         validators=[
             MinValueValidator(1),
             MaxValueValidator(32767),
-        ]
+        ],
     )
     image = models.ImageField(
+        "Фото рецепта",
         upload_to="recipies/",
         null=True,
     )
@@ -96,16 +115,16 @@ class Recipe(models.Model):
         return self.name
 
 
-class Favourite(models.Model):
+class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="favourites",
+        related_name="favorites",
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name="favourites",
+        related_name="favorites",
     )
 
     class Meta:
