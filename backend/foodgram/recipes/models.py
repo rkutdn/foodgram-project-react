@@ -13,19 +13,6 @@ def validate_hex(value):
         raise ValidationError("%s is not an HEX color" % value)
 
 
-# class IngridientsFilter(InputFilter):
-#     parameter_name = "uid"
-#     title = _("UID")
-
-#     def queryset(self, request, queryset):
-#         if self.value() is not None:
-#             uid = self.value()
-
-#             return queryset.filter(
-#                 Q(uid=uid) | Q(payment__uid=uid) | Q(user__uid=uid)
-#             )
-
-
 class Ingredient(models.Model):
     name = models.CharField(
         "Название ингредиента", max_length=200, unique=True
