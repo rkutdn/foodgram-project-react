@@ -63,7 +63,7 @@ class IngredientAmount(models.Model):
         verbose_name_plural = "Количество ингредиентов"
 
     def __str__(self):
-        return f"{self.recipe.name}: {self.ingredient.name} – {self.amount}"
+        return f"{self.ingredient.name} – {self.amount}"
 
 
 class Recipe(models.Model):
