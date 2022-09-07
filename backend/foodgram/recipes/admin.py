@@ -4,7 +4,6 @@ from recipes.models import (
     Ingredient,
     Tag,
     Favorite,
-    Subscription,
     ShoppingList,
     Recipe,
 )
@@ -12,7 +11,6 @@ from recipes.filters import NameFilter, UsernameFilter, TagnameFilter
 
 admin.site.register(Tag)
 admin.site.register(Favorite)
-admin.site.register(Subscription)
 admin.site.register(ShoppingList)
 
 

@@ -123,27 +123,6 @@ class Favorite(models.Model):
         return f"{self.user.username} – {self.recipe.name}"
 
 
-class Subscription(models.Model):
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="authors",
-    )
-    follower = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="followers",
-    )
-
-    class Meta:
-        ordering = ["id"]
-        verbose_name = "Подписка"
-        verbose_name_plural = "Подписки"
-
-    def __str__(self):
-        return f"{self.author.username} – {self.follower.username}"
-
-
 class ShoppingList(models.Model):
     user = models.ForeignKey(
         User,

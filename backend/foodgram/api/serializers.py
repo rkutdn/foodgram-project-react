@@ -2,7 +2,6 @@ import base64
 import uuid
 
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField, StringRelatedField
 from rest_framework.validators import UniqueTogetherValidator
 from django.core.files.base import ContentFile
 
@@ -183,3 +182,19 @@ class RecipePostSerializer(RecipeSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source="recipe.id")
+    name = serializers.ReadOnlyField(source="recipe.name")
+    cooking_time = serializers.ReadOnlyField(source="recipe.cooking_time")
+
+    class Meta:
+        model = Favorite
+        fields = ("id", "name", "cooking_time")
+
+
+class ShoppingListSerializer(FavoriteSerializer):
+    class Meta:
+        model = ShoppingList
+        fields = ("id", "name", "cooking_time")
