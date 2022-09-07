@@ -1,6 +1,10 @@
+import base64
+import uuid
+
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField, StringRelatedField
 from rest_framework.validators import UniqueTogetherValidator
+from django.core.files.base import ContentFile
 
 from users.serializers import CustomUserSerializer
 
@@ -149,6 +153,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
+
+    def to_internal_value(self, data):
+        format, imgstr = data["image"].split(";base64,")
+        ext = format.split("/")[-1]
+        file_name = str(uuid.uuid4())
+        img_file = ContentFile(
+            base64.b64decode(imgstr), name=f"{file_name}.{ext}"
+        )
+
+        data["image"] = img_file
+
+        return super().to_internal_value(data)
 
     validators = [
         UniqueTogetherValidator(

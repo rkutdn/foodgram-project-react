@@ -131,3 +131,6 @@ dmypy.json
 # .idea
 .idea
 .DS_Store
+
+# Static files
+media/
