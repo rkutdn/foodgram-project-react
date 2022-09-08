@@ -1,6 +1,7 @@
+from fpdf import FPDF
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from recipes.models import Recipe
 
@@ -41,3 +42,15 @@ def create_and_delete_relation(
         instance = get_object_or_404(model, user=user, recipe=recipe)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def ingredients_dict_to_pdf(ing_dict):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.add_font("DejaVu", fname="api/fonts/DejaVuSans.ttf", uni=True)
+    pdf.set_font("DejaVu", size=20)
+    pdf.cell(200, 20, txt="Список ингредиентов:", ln=1, align="C")
+    for key, value in ing_dict.items():
+        key = key.split()
+        pdf.cell(200, 10, txt=f"{key[0]} - {value} {key[1]}", ln=1, align="L")
+    return pdf.output("api/shopping_list/shopping_list.pdf")
