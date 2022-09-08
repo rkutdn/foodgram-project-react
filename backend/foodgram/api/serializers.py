@@ -31,25 +31,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         lookup_field = "name"
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
-    cooking_time = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Favorite
-        fields = ("id", "name", "cooking_time")
-
-    def get_id(self, obj):
-        return obj.recipe.id
-
-    def get_name(self, obj):
-        return obj.recipe.name
-
-    def get_cooking_time(self, obj):
-        return obj.recipe.cooking_time
-
-
 class IngredientAmountSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(), source="ingredient"
@@ -188,10 +169,16 @@ class FavoriteSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="recipe.id")
     name = serializers.ReadOnlyField(source="recipe.name")
     cooking_time = serializers.ReadOnlyField(source="recipe.cooking_time")
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        image_url = obj.recipe.image.url
+        return request.build_absolute_uri(image_url)
 
     class Meta:
         model = Favorite
-        fields = ("id", "name", "cooking_time")
+        fields = ("id", "name", "cooking_time", "image")
 
 
 class ShoppingListSerializer(FavoriteSerializer):

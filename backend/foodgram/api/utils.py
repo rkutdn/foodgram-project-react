@@ -24,7 +24,9 @@ def create_and_delete_relation(
                 status=status.HTTP_400_BAD_REQUEST,
             )
         relation = model.objects.create(user=user, recipe=recipe)
-        serializer = serializer_for_model(relation)
+        serializer = serializer_for_model(
+            relation, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     elif request.method == "DELETE":
         if not is_relation_exists:
