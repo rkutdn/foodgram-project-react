@@ -42,9 +42,16 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        image_url = obj.image.url
+        return request.build_absolute_uri(image_url)
+
     class Meta:
         model = Recipe
-        fields = ("id", "name", "cooking_time")
+        fields = ("id", "name", "cooking_time", "image")
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -62,7 +69,11 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, obj):
         queryset = Recipe.objects.filter(author=obj.follower)
-        serializer = RecipeForSubscriptionsSerializer(queryset, many=True)
+        serializer = RecipeForSubscriptionsSerializer(
+            queryset,
+            many=True,
+            context={"request": self.context.get("request")},
+        )
         return serializer.data
 
     def get_recipes_count(self, obj):

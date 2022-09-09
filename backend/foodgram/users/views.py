@@ -11,8 +11,18 @@ from users.serializers import SubscribeSerializer
 class CustomUserViewSet(UserViewSet):
     @action(methods=["get"], detail=False, url_path="subscriptions")
     def subscriptions(self, request):
-        queryset = Subscription.objects.filter(author=request.user)
-        serializer = SubscribeSerializer(queryset, many=True)
+        queryset = self.filter_queryset(
+            Subscription.objects.filter(author=request.user)
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SubscribeSerializer(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
+        serializer = SubscribeSerializer(
+            queryset, many=True, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["post", "delete"], detail=True, url_path="subscribe")
@@ -41,7 +51,9 @@ class CustomUserViewSet(UserViewSet):
             instance = Subscription.objects.create(
                 author=author, follower=follower
             )
-            serializer = SubscribeSerializer(instance)
+            serializer = SubscribeSerializer(
+                instance, context={"request": request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
             if not is_relation_exists:
