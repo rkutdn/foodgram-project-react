@@ -135,15 +135,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def to_internal_value(self, data):
-        format, imgstr = data["image"].split(";base64,")
-        ext = format.split("/")[-1]
-        file_name = str(uuid.uuid4())
-        img_file = ContentFile(
-            base64.b64decode(imgstr), name=f"{file_name}.{ext}"
-        )
+        if "image" in data:
+            format, imgstr = data["image"].split(";base64,")
+            ext = format.split("/")[-1]
+            file_name = str(uuid.uuid4())
+            img_file = ContentFile(
+                base64.b64decode(imgstr), name=f"{file_name}.{ext}"
+            )
 
-        data["image"] = img_file
-
+            data["image"] = img_file
         return super().to_internal_value(data)
 
     validators = [
