@@ -134,3 +134,6 @@ dmypy.json
 
 # Static files
 media/
+
+# Shopping lists files
+*.pdf
