@@ -2,8 +2,10 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import Recipe, Ingredient, Tag, Favorite, ShoppingList
+from recipes.filters import RecipeFilter
 
 from api.serializers import (
     TagSerializer,
@@ -32,6 +34,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAdminAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -77,11 +81,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         ingredient.amount,
                     )
                 )
-        ing_set = set((item[0] + " " + item[1]) for item in ingredients_list)
+        ing_set = set(f"{item[0]} ({item[1]})" for item in ingredients_list)
         ing_list = list(ing_set)
         ing_dict = dict.fromkeys(sorted(ing_list), 0)
         for ingredient in ingredients_list:
-            ing_dict[(ingredient[0] + " " + ingredient[1])] += ingredient[2]
+            ing_dict[f"{ingredient[0]} ({ingredient[1]})"] += ingredient[2]
         ingredients_dict_to_pdf(ing_dict)
         pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
         content_type = "application/pdf"
