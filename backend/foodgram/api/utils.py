@@ -52,5 +52,5 @@ def ingredients_dict_to_pdf(ing_dict):
     pdf.cell(200, 20, txt="Список ингредиентов:", ln=1, align="C")
     for key, value in ing_dict.items():
         key = key.split()
-        pdf.cell(200, 10, txt=f"{key[0]} - {value} {key[1]}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"{key} - {value}", ln=1, align="L")
     return pdf.output("api/shopping_list/shopping_list.pdf")
