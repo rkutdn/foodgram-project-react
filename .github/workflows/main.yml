@@ -44,6 +44,7 @@ jobs:
         # Пуш образа в Docker Hub 
         uses: docker/build-push-action@v2 
         with:
+          context: ./backend/
           push: true
           tags: rkutdn/foodgram:latest
   deploy:
