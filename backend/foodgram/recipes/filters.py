@@ -42,10 +42,8 @@ class RecipeFilter(rest_framework.FilterSet):
         favorits = Favorite.objects.filter(user=self.request.user.id)
         favorits_recipes_id = [favorite.recipe.id for favorite in favorits]
         if value == 1:
-            queryset = Recipe.objects.filter(id__in=favorits_recipes_id)
-        elif value == 0:
-            queryset = Recipe.objects.all().exclude(id__in=favorits_recipes_id)
-        return queryset
+            return Recipe.objects.filter(id__in=favorits_recipes_id)
+        return Recipe.objects.all().exclude(id__in=favorits_recipes_id)
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         items_in_shopping_cart = ShoppingList.objects.filter(
@@ -53,10 +51,8 @@ class RecipeFilter(rest_framework.FilterSet):
         )
         recipes_list = [item.recipe.id for item in items_in_shopping_cart]
         if value == 1:
-            queryset = Recipe.objects.filter(id__in=recipes_list)
-        elif value == 0:
-            queryset = Recipe.objects.all().exclude(id__in=recipes_list)
-        return queryset
+            return Recipe.objects.filter(id__in=recipes_list)
+        return Recipe.objects.all().exclude(id__in=recipes_list)
 
     class Meta:
         fields = ("author",)

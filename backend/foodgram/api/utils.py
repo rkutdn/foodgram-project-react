@@ -28,7 +28,7 @@ def create_and_delete_relation(
             relation, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    elif request.method == "DELETE":
+    else:
         if not is_relation_exists:
             return Response(
                 {

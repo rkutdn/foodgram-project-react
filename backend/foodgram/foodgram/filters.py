@@ -22,3 +22,4 @@ class Filter(admin.SimpleListFilter):
 
         if value:
             return queryset.filter(**kwargs)
+        return queryset

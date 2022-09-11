@@ -55,7 +55,7 @@ class CustomUserViewSet(UserViewSet):
                 instance, context={"request": request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == "DELETE":
+        else:
             if not is_relation_exists:
                 return Response(
                     {
