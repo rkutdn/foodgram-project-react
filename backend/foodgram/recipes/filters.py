@@ -1,8 +1,8 @@
-from django_filters import rest_framework, filters
+from django_filters import filters, rest_framework
 from rest_framework.filters import SearchFilter
 
 from foodgram.filters import Filter
-from recipes.models import Recipe, Favorite, ShoppingList, Tag, Ingredient
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingList, Tag
 
 
 class NameFilter(Filter):

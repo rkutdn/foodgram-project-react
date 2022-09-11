@@ -1,11 +1,8 @@
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from djoser.serializers import (
-    UserSerializer,
-    UserCreateSerializer,
-)
 
-from users.models import User, Subscription
 from recipes.models import Recipe
+from users.models import Subscription, User
 
 
 class CustomUserSerializer(UserSerializer):

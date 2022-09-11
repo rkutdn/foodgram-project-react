@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from users.models import User, Subscription
-from users.filters import NameFilter, EmailFilter
+from users.filters import EmailFilter, NameFilter
+from users.models import Subscription, User
 
 
 class UserAdmin(admin.ModelAdmin):

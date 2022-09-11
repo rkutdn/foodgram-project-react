@@ -1,20 +1,13 @@
 import base64
 import uuid
 
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from django.core.files.base import ContentFile
 
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingList, Tag)
 from users.serializers import CustomUserSerializer
-
-from recipes.models import (
-    Tag,
-    Recipe,
-    Ingredient,
-    Favorite,
-    ShoppingList,
-    IngredientAmount,
-)
 
 
 class TagSerializer(serializers.ModelSerializer):

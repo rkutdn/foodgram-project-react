@@ -1,13 +1,7 @@
 from django.contrib import admin
 
-from recipes.models import (
-    Ingredient,
-    Tag,
-    Favorite,
-    ShoppingList,
-    Recipe,
-)
-from recipes.filters import NameFilter, UsernameFilter, TagnameFilter
+from recipes.filters import NameFilter, TagnameFilter, UsernameFilter
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingList, Tag
 
 admin.site.register(Tag)
 admin.site.register(Favorite)
