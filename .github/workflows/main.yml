@@ -24,10 +24,10 @@ jobs:
     #   run: |
     #     python -m flake8
 
-  build_and_push_to_docker_hub:
+  build_and_push_backend_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-    needs: tests
+    needs: test
     steps:
       - name: Check out the repo
         # Проверка доступности репозитория Docker Hub для workflow
@@ -72,7 +72,9 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build_and_push_to_docker_hub
+    needs:
+      - build_and_push_backend_to_docker_hub
+      - build_and_push_frontend_to_docker_hub
     steps:
     - name: executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
@@ -82,11 +84,23 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          # Выполняет pull образа с DockerHub
-          sudo docker pull rkutdn/foodgram
-          #остановка всех контейнеров
-          sudo docker stop $(sudo docker ps -a -q)
-          sudo docker run --rm -d -p 5000:5000 rkutdn/foodgram
+          sudo docker compose stop
+            sudo docker compose rm -f web
+            sudo docker compose rm -f frontend
+            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/foodgram_front
+            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/foodgram_back
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_back:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_front:latest
+            touch .env
+            echo -n > .env
+            echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+            sudo docker compose up -d
+            sudo docker compose exec web python manage.py collectstatic --no-input
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
