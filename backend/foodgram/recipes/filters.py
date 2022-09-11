@@ -1,7 +1,8 @@
-from django_filters import rest_framework
+from django_filters import rest_framework, filters
+from rest_framework.filters import SearchFilter
 
 from foodgram.filters import Filter
-from recipes.models import Recipe, Favorite, ShoppingList
+from recipes.models import Recipe, Favorite, ShoppingList, Tag, Ingredient
 
 
 class NameFilter(Filter):
@@ -19,24 +20,31 @@ class TagnameFilter(Filter):
     parameter_name = "tags__name"
 
 
+class IngredientFilter(SearchFilter):
+    search_param = "name"
+
+
 class RecipeFilter(rest_framework.FilterSet):
-    tags = rest_framework.CharFilter(
-        field_name="tags__slug",
-    )
+    author = filters.NumberFilter(field_name="author__id", lookup_expr="exact")
     is_favorited = rest_framework.BooleanFilter(
         field_name="is_favorited", method="filter_is_favorited"
     )
     is_in_shopping_cart = rest_framework.BooleanFilter(
         field_name="is_in_shopping_cart", method="filter_is_in_shopping_cart"
     )
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name="tags__slug",
+        to_field_name="slug",
+        queryset=Tag.objects.all(),
+    )
 
     def filter_is_favorited(self, queryset, name, value):
         favorits = Favorite.objects.filter(user=self.request.user.id)
-        recipes_list = [favorite.recipe.id for favorite in favorits]
+        favorits_recipes_id = [favorite.recipe.id for favorite in favorits]
         if value == 1:
-            queryset = Recipe.objects.filter(id__in=recipes_list)
+            queryset = Recipe.objects.filter(id__in=favorits_recipes_id)
         elif value == 0:
-            queryset = Recipe.objects.all().exclude(id__in=recipes_list)
+            queryset = Recipe.objects.all().exclude(id__in=favorits_recipes_id)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
@@ -51,5 +59,5 @@ class RecipeFilter(rest_framework.FilterSet):
         return queryset
 
     class Meta:
-        fields = ("tags", "author")
+        fields = ("author",)
         model = Recipe

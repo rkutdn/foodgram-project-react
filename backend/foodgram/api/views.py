@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import Recipe, Ingredient, Tag, Favorite, ShoppingList
-from recipes.filters import RecipeFilter
+from recipes.filters import RecipeFilter, IngredientFilter
 
 from api.serializers import (
     TagSerializer,
@@ -29,6 +29,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filter_backends = (IngredientFilter,)
+    search_fields = ("^name",)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
