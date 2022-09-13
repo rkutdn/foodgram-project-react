@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from users.filters import EmailFilter, NameFilter
 from users.models import Subscription, User
 

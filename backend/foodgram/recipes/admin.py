@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from recipes.filters import NameFilter, TagnameFilter, UsernameFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingList, Tag
 

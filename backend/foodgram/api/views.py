@@ -1,7 +1,9 @@
 from wsgiref.util import FileWrapper
 
-# from django.http import FileResponse
-
+from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from api.permissions import IsAdminAuthorOrReadOnly
 from api.serializers import (
@@ -13,12 +15,8 @@ from api.serializers import (
     TagSerializer,
 )
 from api.utils import create_relation, delete_relation, ingredients_dict_to_pdf
-from django.http import HttpResponse, FileResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from recipes.filters import IngredientFilter, RecipeFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingList, Tag
-from rest_framework import viewsets
-from rest_framework.decorators import action
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
