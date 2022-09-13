@@ -1,5 +1,3 @@
-from wsgiref.util import FileWrapper
-
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
@@ -112,7 +110,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             common_unique_ingredients[ingredient["name_unit"]] += ingredient[
                 "amount"
             ]
-        ingredients_dict_to_pdf(common_unique_ingredients)
-        pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
+        pdf_file = ingredients_dict_to_pdf(common_unique_ingredients)
         content_type = "application/pdf"
-        return HttpResponse(FileWrapper(pdf_file), content_type=content_type)
+        return HttpResponse(pdf_file, content_type=content_type)
