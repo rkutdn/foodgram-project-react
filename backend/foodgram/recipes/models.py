@@ -45,7 +45,7 @@ class Tag(models.Model):
 
 
 class IngredientAmount(models.Model):
-    amount = models.SmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(32767),
@@ -69,7 +69,7 @@ class IngredientAmount(models.Model):
 class Recipe(models.Model):
     name = models.CharField("Название рецепта", max_length=200)
     text = models.TextField("Текст рецепта")
-    cooking_time = models.SmallIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         "Время приготовления (мин)",
         validators=[
             MinValueValidator(1),
