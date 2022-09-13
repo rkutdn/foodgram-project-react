@@ -40,7 +40,7 @@ class RecipeFilter(rest_framework.FilterSet):
     def filter_is_favorited(self, queryset, name, value):
         favorits = Favorite.objects.filter(user=self.request.user.id)
         favorits_recipes_id = [favorite.recipe.id for favorite in favorits]
-        if value == 1:
+        if value:
             return Recipe.objects.filter(id__in=favorits_recipes_id)
         return Recipe.objects.all().exclude(id__in=favorits_recipes_id)
 
@@ -49,7 +49,7 @@ class RecipeFilter(rest_framework.FilterSet):
             user=self.request.user.id
         )
         recipes_list = [item.recipe.id for item in items_in_shopping_cart]
-        if value == 1:
+        if value:
             return Recipe.objects.filter(id__in=recipes_list)
         return Recipe.objects.all().exclude(id__in=recipes_list)
 

@@ -37,7 +37,7 @@ class CustomUserViewSet(UserViewSet):
                 return Response(
                     {
                         "errors": (
-                            f"Вы уже подписаны на пользователя"
+                            "Вы уже подписаны на пользователя"
                             f" {follower.username}!"
                         )
                     },

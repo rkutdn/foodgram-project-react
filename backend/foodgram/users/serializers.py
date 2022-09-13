@@ -7,12 +7,6 @@ from users.models import Subscription, User
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    def get_is_subscribed(self, obj):
-        return Subscription.objects.filter(
-            author=self.context["request"].user.id,
-            follower=obj.id,
-        ).exists()
-
     class Meta:
         model = User
         fields = (
@@ -23,6 +17,12 @@ class CustomUserSerializer(UserSerializer):
             "last_name",
             "is_subscribed",
         )
+
+    def get_is_subscribed(self, obj):
+        return Subscription.objects.filter(
+            author=self.context["request"].user.id,
+            follower=obj.id,
+        ).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -40,14 +40,14 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "cooking_time", "image")
+
     def get_image(self, obj):
         request = self.context.get("request")
         image_url = obj.image.url
         return request.build_absolute_uri(image_url)
-
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "cooking_time", "image")
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -59,6 +59,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Subscription
+        fields = (
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipes",
+            "recipes_count",
+        )
 
     def get_is_subscribed(self, obj):
         return True
@@ -74,16 +87,3 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return obj.follower.recipes.count()
-
-    class Meta:
-        model = Subscription
-        fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "recipes",
-            "recipes_count",
-        )

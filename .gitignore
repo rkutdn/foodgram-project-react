@@ -137,3 +137,4 @@ media/
 
 # Shopping lists files
 *.pdf
+*.pkl

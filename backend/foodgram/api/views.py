@@ -1,11 +1,19 @@
 from wsgiref.util import FileWrapper
 
+# from django.http import FileResponse
+
+
 from api.permissions import IsAdminAuthorOrReadOnly
-from api.serializers import (FavoriteSerializer, IngredientSerializer,
-                             RecipeGetSerializer, RecipePostSerializer,
-                             ShoppingListSerializer, TagSerializer)
+from api.serializers import (
+    FavoriteSerializer,
+    IngredientSerializer,
+    RecipeGetSerializer,
+    RecipePostSerializer,
+    ShoppingListSerializer,
+    TagSerializer,
+)
 from api.utils import create_and_delete_relation, ingredients_dict_to_pdf
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.filters import IngredientFilter, RecipeFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingList, Tag
@@ -82,7 +90,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ing_dict = dict.fromkeys(sorted(ing_list), 0)
         for ingredient in ingredients_list:
             ing_dict[f"{ingredient[0]} ({ingredient[1]})"] += ingredient[2]
-        ingredients_dict_to_pdf(ing_dict)
-        pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
+        # ingredients_dict_to_pdf(ing_dict)
+        # pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
         content_type = "application/pdf"
-        return HttpResponse(FileWrapper(pdf_file), content_type=content_type)
+        # return HttpResponse(
+        #     FileWrapper(ingredients_dict_to_pdf(ing_dict)),
+        #     content_type=content_type,
+        # )
+        pdf_string = ingredients_dict_to_pdf(ing_dict)
+        # print(pdf_string)
+        # return FileResponse(
+        #     pdf_string,
+        #     as_attachment=True,
+        #     filename="hello.pdf",
+        # )
+        print(pdf_string)
+        # print(len(pdf_string))
+        # pdf = open(pdf_string, "r")
+        # response = FileResponse(
+        #     pdf_string, as_attachment=True, filename="test.pdf"
+        # )
+        # response[
+        #     "Content-Disposition"
+        # ] = "attachment; filename='file_name.pdf'"
+        # return response
+        return FileResponse(pdf_string, content_type=content_type)

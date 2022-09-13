@@ -2,14 +2,16 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth import get_user_model
 from django.db import models
-from users.models import User
+
+User = get_user_model()
 
 
 def validate_hex(value):
     pattern = re.compile("^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$")
     if pattern.match(value) is None:
-        raise ValidationError("%s is not an HEX color" % value)
+        raise ValidationError(f"{value} is not an HEX color")
 
 
 class Ingredient(models.Model):
