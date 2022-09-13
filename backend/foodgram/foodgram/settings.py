@@ -141,9 +141,9 @@ USE_TZ = False
 
 DJOSER = {
     "SERIALIZERS": {
-        "user": "users.serializers.CustomUserSerializer",
-        "current_user": "users.serializers.CustomUserSerializer",
-        "user_create": "users.serializers.CustomUserCreateSerializer",
+        "user": "users.serializers.SubscribedUserSerializer",
+        "current_user": "users.serializers.SubscribedUserSerializer",
+        "user_create": "users.serializers.UserNeededFieldsCreateSerializer",
     },
     "USER_CREATE_PASSWORD_RETYPE": False,
     "LOGIN_FIELD": "email",

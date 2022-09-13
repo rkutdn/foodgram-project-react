@@ -12,7 +12,7 @@ from api.serializers import (
     ShoppingListSerializer,
     TagSerializer,
 )
-from api.utils import create_and_delete_relation, ingredients_dict_to_pdf
+from api.utils import create_relation, delete_relation, ingredients_dict_to_pdf
 from django.http import HttpResponse, FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.filters import IngredientFilter, RecipeFilter
@@ -52,7 +52,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=["post", "delete"], detail=True, url_path="favorite")
     def favorite(self, request, pk=None):
-        return create_and_delete_relation(
+        if request.method == "POST":
+            return create_relation(
+                request,
+                pk,
+                Favorite,
+                FavoriteSerializer,
+                part_of_error_message="избранном",
+            )
+        return delete_relation(
             request,
             pk,
             Favorite,
@@ -62,7 +70,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=["post", "delete"], detail=True, url_path="shopping_cart")
     def shopping_cart(self, request, pk=None):
-        return create_and_delete_relation(
+        if request.method == "POST":
+            return create_relation(
+                request,
+                pk,
+                ShoppingList,
+                ShoppingListSerializer,
+                part_of_error_message="списке покупок",
+            )
+        return delete_relation(
             request,
             pk,
             ShoppingList,
@@ -73,45 +89,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=["get"], detail=False, url_path="download_shopping_cart")
     def download_shopping_cart(self, request):
         shopping_list = ShoppingList.objects.filter(user=request.user)
-        recipes_list = [instance.recipe for instance in shopping_list]
-        ingredients_list = []
-        for recipe in recipes_list:
+        recipes_in_shopping_list = [
+            instance.recipe for instance in shopping_list
+        ]
+        common_ingredients = []
+        for recipe in recipes_in_shopping_list:
             ingredients = recipe.ingredients.all()
             for ingredient in ingredients:
-                ingredients_list.append(
-                    (
-                        ingredient.ingredient.name,
-                        ingredient.ingredient.measurement_unit,
-                        ingredient.amount,
-                    )
+                name = ingredient.ingredient.name
+                unit = ingredient.ingredient.measurement_unit
+                common_ingredients.append(
+                    {
+                        "name_unit": f"{name} ({unit})",
+                        "amount": ingredient.amount,
+                    }
                 )
-        ing_set = set(f"{item[0]} ({item[1]})" for item in ingredients_list)
-        ing_list = list(ing_set)
-        ing_dict = dict.fromkeys(sorted(ing_list), 0)
-        for ingredient in ingredients_list:
-            ing_dict[f"{ingredient[0]} ({ingredient[1]})"] += ingredient[2]
-        # ingredients_dict_to_pdf(ing_dict)
-        # pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
+        ingredients_name_unit = list(
+            set(ingredient["name_unit"] for ingredient in common_ingredients)
+        )
+        common_unique_ingredients = dict.fromkeys(
+            sorted(ingredients_name_unit), 0
+        )
+        for ingredient in common_ingredients:
+            common_unique_ingredients[ingredient["name_unit"]] += ingredient[
+                "amount"
+            ]
+        ingredients_dict_to_pdf(common_unique_ingredients)
+        pdf_file = open("api/shopping_list/shopping_list.pdf", "rb")
         content_type = "application/pdf"
-        # return HttpResponse(
-        #     FileWrapper(ingredients_dict_to_pdf(ing_dict)),
-        #     content_type=content_type,
-        # )
-        pdf_string = ingredients_dict_to_pdf(ing_dict)
-        # print(pdf_string)
-        # return FileResponse(
-        #     pdf_string,
-        #     as_attachment=True,
-        #     filename="hello.pdf",
-        # )
-        print(pdf_string)
-        # print(len(pdf_string))
-        # pdf = open(pdf_string, "r")
-        # response = FileResponse(
-        #     pdf_string, as_attachment=True, filename="test.pdf"
-        # )
-        # response[
-        #     "Content-Disposition"
-        # ] = "attachment; filename='file_name.pdf'"
-        # return response
-        return FileResponse(pdf_string, content_type=content_type)
+        return HttpResponse(FileWrapper(pdf_file), content_type=content_type)

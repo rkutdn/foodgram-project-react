@@ -7,7 +7,7 @@ from users.models import Subscription, User
 from users.serializers import SubscribeSerializer
 
 
-class CustomUserViewSet(UserViewSet):
+class SubscriptionsUserViewSet(UserViewSet):
     @action(methods=["get"], detail=False, url_path="subscriptions")
     def subscriptions(self, request):
         queryset = Subscription.objects.filter(author=request.user).order_by(
@@ -45,7 +45,7 @@ class CustomUserViewSet(UserViewSet):
                 )
             if author == follower:
                 return Response(
-                    {"errors": ("Подписываться на самого себя" "запрещено!")},
+                    {"errors": ("Подписываться на самого себя запрещено!")},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             instance = Subscription.objects.create(

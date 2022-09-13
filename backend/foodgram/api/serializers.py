@@ -12,7 +12,7 @@ from recipes.models import (
 )
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from users.serializers import CustomUserSerializer
+from users.serializers import SubscribedUserSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -48,7 +48,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    author = CustomUserSerializer(
+    author = SubscribedUserSerializer(
         read_only=True, default=serializers.CurrentUserDefault()
     )
     ingredients = IngredientAmountSerializer(many=True)
@@ -114,14 +114,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 _create,
             ) = IngredientAmount.objects.get_or_create(**ingredient)
             instance.ingredients.add(ingredient_in_recipe)
-        instance.name = validated_data.get("name", instance.name)
-        instance.image = validated_data.get("image", instance.image)
-        instance.text = validated_data.get("text", instance.text)
-        instance.cooking_time = validated_data.get(
-            "cooking_time", instance.cooking_time
-        )
-        instance.save()
-        return instance
+        return super().update(instance, validated_data)
 
     def to_internal_value(self, data):
         if "image" in data:

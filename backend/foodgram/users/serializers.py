@@ -4,7 +4,7 @@ from rest_framework import serializers
 from users.models import Subscription, User
 
 
-class CustomUserSerializer(UserSerializer):
+class SubscribedUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,7 +25,7 @@ class CustomUserSerializer(UserSerializer):
         ).exists()
 
 
-class CustomUserCreateSerializer(UserCreateSerializer):
+class UserNeededFieldsCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
         fields = (
