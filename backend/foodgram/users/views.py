@@ -43,7 +43,7 @@ class CustomUserViewSet(UserViewSet):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            elif author == follower:
+            if author == follower:
                 return Response(
                     {"errors": ("Подписываться на самого себя" "запрещено!")},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -55,21 +55,20 @@ class CustomUserViewSet(UserViewSet):
                 instance, context={"request": request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            if not is_relation_exists:
-                return Response(
-                    {
-                        "errors": (
-                            f"Вы не подписаны на пользователя"
-                            f"{follower.username}!"
-                        )
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            instance = get_object_or_404(
-                Subscription,
-                author=author,
-                follower=follower,
+        if not is_relation_exists:
+            return Response(
+                {
+                    "errors": (
+                        f"Вы не подписаны на пользователя"
+                        f"{follower.username}!"
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = get_object_or_404(
+            Subscription,
+            author=author,
+            follower=follower,
+        )
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
