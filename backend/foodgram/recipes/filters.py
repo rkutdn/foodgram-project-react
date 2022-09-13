@@ -41,16 +41,16 @@ class RecipeFilter(rest_framework.FilterSet):
     def filter_is_favorited(self, _queryset, _name, value):
         favorits_recipes_id = Favorite.objects.filter(
             user=self.request.user.id
-        ).values_list("id", flat=True)
+        ).values_list("recipe__id", flat=True)
         if value:
+            print(Recipe.objects.filter(id__in=favorits_recipes_id))
             return Recipe.objects.filter(id__in=favorits_recipes_id)
         return Recipe.objects.all().exclude(id__in=favorits_recipes_id)
 
     def filter_is_in_shopping_cart(self, _queryset, _name, value):
         shopping_cart_resipes_id = ShoppingList.objects.filter(
             user=self.request.user.id
-        ).values_list("id", flat=True)
-        # recipes_list = [item.recipe.id for item in items_in_shopping_cart]
+        ).values_list("recipe__id", flat=True)
         if value:
             return Recipe.objects.filter(id__in=shopping_cart_resipes_id)
         return Recipe.objects.all().exclude(id__in=shopping_cart_resipes_id)
