@@ -18,10 +18,10 @@ class Filter(admin.SimpleListFilter):
 
     def queryset(self, _request, queryset):
         value = self.value()
-        kwargs = {
-            "{0}__{1}".format(self.parameter_name, "contains"): value,
-        }
 
         if value:
+            kwargs = {
+                f"{self.parameter_name}__contains": value,
+            }
             return queryset.filter(**kwargs)
         return queryset

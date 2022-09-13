@@ -9,8 +9,7 @@ User = get_user_model()
 
 
 def validate_hex(value):
-    pattern = re.compile("^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$")
-    if pattern.match(value) is None:
+    if re.match("^#(([a-fA-F0-9]{3}){1,2})$", value) is None:
         raise ValidationError(f"{value} is not an HEX color")
 
 
