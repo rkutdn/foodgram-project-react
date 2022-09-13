@@ -37,14 +37,14 @@ class RecipeFilter(rest_framework.FilterSet):
         queryset=Tag.objects.all(),
     )
 
-    def filter_is_favorited(self, queryset, name, value):
+    def filter_is_favorited(self, _queryset, _name, value):
         favorits = Favorite.objects.filter(user=self.request.user.id)
         favorits_recipes_id = [favorite.recipe.id for favorite in favorits]
         if value:
             return Recipe.objects.filter(id__in=favorits_recipes_id)
         return Recipe.objects.all().exclude(id__in=favorits_recipes_id)
 
-    def filter_is_in_shopping_cart(self, queryset, name, value):
+    def filter_is_in_shopping_cart(self, _queryset, _name, value):
         items_in_shopping_cart = ShoppingList.objects.filter(
             user=self.request.user.id
         )
