@@ -43,7 +43,6 @@ class RecipeFilter(rest_framework.FilterSet):
             user=self.request.user.id
         ).values_list("recipe__id", flat=True)
         if value:
-            print(Recipe.objects.filter(id__in=favorits_recipes_id))
             return Recipe.objects.filter(id__in=favorits_recipes_id)
         return Recipe.objects.all().exclude(id__in=favorits_recipes_id)
 
